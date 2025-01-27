@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import TipoPet from "../tipos/TipoPet";
 import EnumEspecie from "../enum/EnumEspecie";
+import PetRepository from "../repositories/PetRepository";
+import PetEntity from "../entities/PetEntity";
 
 let listaDePets: Array<TipoPet> = [];
 
@@ -12,21 +14,30 @@ function geraId() {
 
 class PetController {
 
-    static criaPet (req: Request, res: Response) {
-        const { nome, dataDeNascimento, adotado, especie} = req.body as TipoPet;
+    constructor(private repository: PetRepository) {
+    }
+
+    criaPet (req: Request, res: Response) {
+        const { nome, dataDeNascimento, adotado, especie} = req.body as PetEntity;
         if(!Object.values(EnumEspecie).includes(especie)) {
             res.status(400).json({erro: "Espécia inválida."});
         }
-        const pets = {id: geraId(), nome, dataDeNascimento, adotado, especie};
-        listaDePets.push(pets);
-        res.status(201).send({message: "Pet criado com sucesso!", pets: pets});
+        const pet = new PetEntity();
+        pet.id =  geraId(),
+        pet.nome = nome, 
+        pet.dataDeNascimento = dataDeNascimento,
+        pet.adotado = adotado,
+        pet.especie = especie;
+
+        this.repository.criaPet(pet);
+        res.status(201).send({message: "Pet criado com sucesso!", pets: pet});
     }
 
-    static listaPets(req: Request, res: Response) {
+    listaPets(req: Request, res: Response) {
         res.status(200).json(listaDePets);
     }
 
-    static atualizaPet(req: Request, res: Response) {
+    atualizaPet(req: Request, res: Response) {
         const { id } = req.params;
         const { nome, dataDeNascimento, adotado, especie } = req.body as TipoPet;
         const pet = listaDePets.find((pet) => pet.id === Number(id));
@@ -42,7 +53,7 @@ class PetController {
         res.status(200).json({message: "Pet atualizado com sucesso!", pet: pet});
     }
 
-    static deletarPet(req: Request, res: Response) {
+    deletarPet(req: Request, res: Response){
         const {id} = req.params;
         const pet: TipoPet = listaDePets.find((pet) => pet.id === Number(id));
         if(!pet) {
