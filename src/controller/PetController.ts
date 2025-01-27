@@ -33,8 +33,9 @@ class PetController {
         res.status(201).send({message: "Pet criado com sucesso!", pets: pet});
     }
 
-    listaPets(req: Request, res: Response) {
-        res.status(200).json(listaDePets);
+    async listaPets(req: Request, res: Response): Promise<any> {
+        const listaDePets = await this.repository.listaPets();
+        return res.status(200).json(listaDePets);
     }
 
     atualizaPet(req: Request, res: Response) {
