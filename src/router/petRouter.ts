@@ -8,6 +8,7 @@ const petRepository = new PetRepository(AppDataSource.getRepository("PetEntity")
 const petController = new PetController(petRepository);
 
 router.get("/",(req: Request, res: Response) =>  petController.listaPets(req, res));
+router.get("/:id", (req: Request, res: Response) => petController.listaPetById(req, res));
 router.post("/", (req: Request, res: Response) => petController.criaPet(req, res));
 router.put("/:id",(req: Request, res: Response) =>  petController.atualizaPet(req, res));
 router.delete("/:id",(req: Request, res: Response) =>  petController.deletarPet(req, res));

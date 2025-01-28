@@ -33,36 +33,44 @@ class PetController {
         res.status(201).send({message: "Pet criado com sucesso!", pets: pet});
     }
 
+    async listaPetById(req: Request, res: Response) {
+        const { id } = req.params;
+        const pet = await this.repository.listaPetById(Number(id));
+        if(!pet) {
+            res.status(404).json({message: "Pet não encontrado."})
+        }
+        res.status(200).json(pet);
+    }
+
     async listaPets(req: Request, res: Response): Promise<any> {
         const listaDePets = await this.repository.listaPets();
         return res.status(200).json(listaDePets);
     }
 
-    atualizaPet(req: Request, res: Response) {
+    async atualizaPet(req: Request, res: Response): Promise<any> {
         const { id } = req.params;
-        const { nome, dataDeNascimento, adotado, especie } = req.body as TipoPet;
-        const pet = listaDePets.find((pet) => pet.id === Number(id));
+        const { nome, dataDeNascimento, adotado, especie } = req.body as PetEntity;
+        const pet = await this.repository.findById(Number(id));
         if(!pet) {
             res.status(404).json({message: "Pet não encontrado, tente novamente."})
         }
-
         pet.nome = nome;
         pet.dataDeNascimento = dataDeNascimento;
-        pet.adotado = adotado;
         pet.especie = especie;
-        
-        res.status(200).json({message: "Pet atualizado com sucesso!", pet: pet});
+        pet.adotado = adotado;
+        await this.repository.atualizaPet(Number(id), pet);
+
+        return res.status(200).json({message: "Pet atualizado com sucesso!", pet: pet});
     }
 
-    deletarPet(req: Request, res: Response){
+    async deletarPet(req: Request, res: Response): Promise<any>{
         const {id} = req.params;
-        const pet: TipoPet = listaDePets.find((pet) => pet.id === Number(id));
+        const pet: PetEntity = await this.repository.findById(Number(id));
         if(!pet) {
             res.status(404).json({message: "Pet não encontrado, tente novamente."});
         }
-        const index = listaDePets.indexOf(pet);
-        listaDePets.splice(index, 1);
-        res.status(200).json({message: "Pet deletado com sucesso!"});
+        await this.repository.deletaPet(Number(id));
+        return res.status(204);
     }
 }
 
