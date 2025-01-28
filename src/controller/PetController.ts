@@ -49,29 +49,22 @@ class PetController {
 
     async atualizaPet(req: Request, res: Response): Promise<any> {
         const { id } = req.params;
-        const { nome, dataDeNascimento, adotado, especie } = req.body as PetEntity;
+        const { success, message } = await this.repository.atualizaPet(Number(id), req.body as PetEntity);
         const pet = await this.repository.findById(Number(id));
-        if(!pet) {
-            res.status(404).json({message: "Pet não encontrado, tente novamente."})
+        if(!success) {
+            return res.status(404).json({message})
         }
-        pet.nome = nome;
-        pet.dataDeNascimento = dataDeNascimento;
-        pet.especie = especie;
-        pet.adotado = adotado;
-        await this.repository.atualizaPet(Number(id), pet);
-
         return res.status(200).json({message: "Pet atualizado com sucesso!", pet: pet});
     }
 
     async deletarPet(req: Request, res: Response): Promise<any>{
-        const {id} = req.params;
-        const pet: PetEntity = await this.repository.findById(Number(id));
-        if(!pet) {
-            res.status(404).json({message: "Pet não encontrado, tente novamente."});
+        const { id } = req.params;
+        const {success, message} = await this.repository.deletaPet(Number(id)); 
+        if (!success) {
+            return res.status(404).json({message});
         }
-        await this.repository.deletaPet(Number(id));
-        return res.status(204);
-    }
+        return res.status(204).json(message);
+        }
 }
 
 export default PetController;
