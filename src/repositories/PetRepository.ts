@@ -10,9 +10,11 @@ export default class PetRepository implements InterfacePetRepository {
         this.petRepository = petRepository;
     }
 
-    criaPet(pet: PetEntity): void {
-        this.petRepository.save(pet);
+    async criaPet(pet: PetEntity): Promise<PetEntity> {
+        return this.petRepository.save(pet);
     }
+
+
     async listaPets(): Promise<PetEntity[]> {
         return await this.petRepository.find();
     }
@@ -48,19 +50,15 @@ export default class PetRepository implements InterfacePetRepository {
         }
     }
 
-    async findById(id: number): Promise<PetEntity> {
-        return await this.petRepository.findOne({
-            where: {
-                id: id
-            }
-        })
-    }
-
     async listaPetById(id: number): Promise<PetEntity> {
-        return await this.petRepository.findOne({
+        const petId =  await this.petRepository.findOne({
             where: {
                 id: id
             }
         })
+        if(!petId) {
+            throw new Error("Pet não encontrado.");
+        }
+        return petId;
     }
 }

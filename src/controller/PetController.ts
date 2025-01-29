@@ -17,19 +17,14 @@ class PetController {
     constructor(private repository: PetRepository) {
     }
 
-    criaPet (req: Request, res: Response) {
+    async criaPet (req: Request, res: Response) {
         const { nome, dataDeNascimento, adotado, especie} = req.body as PetEntity;
         if(!Object.values(EnumEspecie).includes(especie)) {
             res.status(400).json({erro: "Espécia inválida."});
         }
-        const pet = new PetEntity();
-        pet.id =  geraId(),
-        pet.nome = nome, 
-        pet.dataDeNascimento = dataDeNascimento,
-        pet.adotado = adotado,
-        pet.especie = especie;
+        const pet = new PetEntity(nome, especie, dataDeNascimento, adotado);
 
-        this.repository.criaPet(pet);
+        await this.repository.criaPet(pet);
         res.status(201).send({message: "Pet criado com sucesso!", pets: pet});
     }
 
@@ -50,11 +45,10 @@ class PetController {
     async atualizaPet(req: Request, res: Response): Promise<any> {
         const { id } = req.params;
         const { success, message } = await this.repository.atualizaPet(Number(id), req.body as PetEntity);
-        const pet = await this.repository.findById(Number(id));
         if(!success) {
             return res.status(404).json({message})
         }
-        return res.status(200).json({message: "Pet atualizado com sucesso!", pet: pet});
+        return res.status(200).json({message: "Pet atualizado com sucesso!"});
     }
 
     async deletarPet(req: Request, res: Response): Promise<any>{
