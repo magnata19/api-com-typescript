@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import EnderecoEntity from "./EnderecoEntity";
 
 @Entity()
 export default class AdotanteEntity {
@@ -18,10 +19,11 @@ export default class AdotanteEntity {
     @Column({nullable: true})
     foto?: string;
 
-    @Column({nullable: true})
-    endereco?: string; // endereco pode ser nulo
+    @OneToOne(() => EnderecoEntity, {nullable: true, cascade: true, eager: true})
+    @JoinColumn()
+    endereco?: EnderecoEntity; // endereco pode ser nulo
 
-    constructor(nome: string, senha: string, celular: string, foto?: string, endereco?: string) {
+    constructor(nome: string, senha: string, celular: string, foto?: string, endereco?: EnderecoEntity) {
         this.nome = nome;
         this.senha = senha;
         this.celular = celular;
