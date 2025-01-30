@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import AdotanteRepository from "../repositories/AdotanteRepository";
 import AdotanteEntity from "../entities/AdotanteEntity";
+import EnderecoEntity from "../entities/EnderecoEntity";
 
 export default class AdotanteController {
 
@@ -50,5 +51,14 @@ export default class AdotanteController {
         } catch (err) {
             res.status(404).json({message: "Não foi possível deletar o adotante, tente novamente mais tarde!"});
         }
+    }
+
+    async atualizaEnderecoAdotante(req: Request, res: Response): Promise<any> {
+        const { id } = req.params;
+        const { success, message } = await this.adotanteRepository.atualizaEnderecoAdotante(Number(id), req.body as EnderecoEntity);
+        if (!success) {
+            return res.status(404).json(message);
+        }
+        return res.status(200).json(message);
     }
 }

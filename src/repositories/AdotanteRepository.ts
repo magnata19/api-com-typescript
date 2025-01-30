@@ -1,6 +1,7 @@
 import { Repository } from "typeorm";
 import InterfaceAdotanteRepository from "./interface/InterfaceAdotanteRepository";
 import AdotanteEntity from "../entities/AdotanteEntity";
+import EnderecoEntity from "../entities/EnderecoEntity";
 
 export default class AdotanteRepository implements InterfaceAdotanteRepository {
 
@@ -42,6 +43,17 @@ export default class AdotanteRepository implements InterfaceAdotanteRepository {
         } catch(err) {
             return {success: false, message: "Não foi possível deletar o usuário."}
         }
+    }
+
+    async atualizaEnderecoAdotante(idAdotante: number, endereco: EnderecoEntity): Promise<{ success: boolean; message?: string }> {
+        const adotante = await this.adotanteRepository.findOne({where: { id: idAdotante }});
+        if(!adotante) {
+            return {success: false, message: "Erro ao atualizar endereço."};
+        }
+        const novoEndereco = new EnderecoEntity(endereco.cidade, endereco.estado);
+        adotante.endereco = novoEndereco;
+        await this.adotanteRepository.save(adotante);
+        return {success: true, message:"Endereço atualizado com sucesso!"};
     }
 
 }
