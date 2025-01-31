@@ -18,11 +18,15 @@ class PetController {
     }
 
     async criaPet (req: Request, res: Response) {
-        const { nome, dataDeNascimento, adotado, especie} = req.body as PetEntity;
+        const { nome, dataDeNascimento, adotado, especie, porte} = req.body as PetEntity;
         if(!Object.values(EnumEspecie).includes(especie)) {
             res.status(400).json({erro: "Espécia inválida."});
         }
-        const pet = new PetEntity(nome, especie, dataDeNascimento, adotado);
+
+        if(porte && !(porte in EnumEspecie)) {
+            res.status(400).json({erro: "Porte inválido."})
+        }
+        const pet = new PetEntity(nome, especie, dataDeNascimento, adotado, porte);
 
         await this.repository.criaPet(pet);
         res.status(201).send({message: "Pet criado com sucesso!", pets: pet});
