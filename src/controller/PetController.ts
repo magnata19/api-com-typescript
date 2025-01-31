@@ -59,6 +59,19 @@ class PetController {
         }
         return res.status(204).json(message);
         }
+
+    async adotaPet(req: Request, res: Response): Promise<any> {
+        const { pet_id, adotante_id } = req.params;
+        const { success, message } = await this.repository.adotaPet(
+            Number(pet_id), 
+            Number(adotante_id)
+        );
+
+        if(!success) {
+            return res.status(404).json(message);
+        }
+        return res.status(204).json(message);
+    }
 }
 
 export default PetController;

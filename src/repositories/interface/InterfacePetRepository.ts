@@ -6,4 +6,5 @@ export default interface InterfacePetRepository {
     listaPets(): Array<PetEntity> | Promise<PetEntity[]>;
     atualizaPet(id: number, pet: PetEntity): void;
     deletaPet(id: number): void;
+    adotaPet(pet_id: number, adotante_id: number): void;
 }
