@@ -11,6 +11,7 @@ const petRepository = new PetRepository(
 const petController = new PetController(petRepository);
 
 router.get("/",(req: Request, res: Response) =>  petController.listaPets(req, res));
+router.get("/filtro", (req: Request, res: Response) => petController.buscaPetPorCampoGenerico(req, res));
 router.get("/:id", (req: Request, res: Response) => petController.listaPetById(req, res));
 router.post("/", (req: Request, res: Response) => petController.criaPet(req, res));
 router.put("/:id",(req: Request, res: Response) =>  petController.atualizaPet(req, res));
