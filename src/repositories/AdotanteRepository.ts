@@ -19,7 +19,7 @@ export default class AdotanteRepository implements InterfaceAdotanteRepository {
             await this.adotanteRepository.save(adotante);
         }
 
-    async atualizaAdotante(id: number, adotante: AdotanteEntity): Promise<{ success: boolean; message: string; } | void> {
+    async atualizaAdotante(id: number, adotante: AdotanteEntity): Promise<{ success: boolean; message: string; }> {
         try {
             const adotanteId = await this.adotanteRepository.findOne({ where: { id } });
             if(!adotanteId) {

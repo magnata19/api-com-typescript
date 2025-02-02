@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import AdotanteRepository from "../repositories/AdotanteRepository";
 import AdotanteEntity from "../entities/AdotanteEntity";
 import EnderecoEntity from "../entities/EnderecoEntity";
+import { TipoRequestBodyAdotante, TipoRequestParamsAdotante, TipoResponseBodyAdotante } from "../tipos/tiposAdotante";
 
 export default class AdotanteController {
 
@@ -11,54 +12,59 @@ export default class AdotanteController {
         this.adotanteRepository = adotanteRepository;
     }
 
-    async criarAdotante(req: Request, res: Response): Promise<any>{
+    async criarAdotante(req: Request<TipoRequestParamsAdotante, {}, TipoRequestBodyAdotante>, res: Response<TipoResponseBodyAdotante>): Promise<any>{
         try {
+
             const { nome, senha, celular, foto, endereco } = req.body as AdotanteEntity;
             const adotante = new AdotanteEntity(nome, senha, celular, foto, endereco);
             await this.adotanteRepository.criarAdotante(adotante);
-            return res.status(201).json({message:"Adotante criado com sucesso!", adotante: adotante});
+            return res.status(201).json({data: {id: adotante.id, nome, celular}});
         } catch (err) {
-            return res.status(404).json({message: "Erro interno no servidor.", error: err})
+            return res.status(404).json();
         }
     }
 
-    async listaAdotantes(req: Request, res: Response): Promise<any> {
+    async listaAdotantes(req: Request<TipoRequestParamsAdotante, {}, TipoRequestBodyAdotante>, res: Response<TipoResponseBodyAdotante>): Promise<any> {
         try {
             const adotantes = await this.adotanteRepository.listaAdotantes();
-            return res.status(200).json(adotantes);
+            const data = adotantes.map((adotante) => {
+                return {
+                id: adotante.id,
+                nome: adotante.nome,
+                celular: adotante.celular
+                }
+            })
+            return res.status(200).json({data});
         } catch (err) {
-            return res.status(404).json({message: "Não foi possível listar todos os adotantes.", error: err});
+            return res.status(404).json({ error: err});
         }
     }
 
-    async atualizaAdotante(req: Request, res: Response): Promise<any> {
-        try {
+    async atualizaAdotante(req: Request<TipoRequestParamsAdotante, {}, 
+        TipoRequestBodyAdotante>, res: Response<TipoResponseBodyAdotante>): Promise<any> {
             const { id } = req.params;
-            const { nome, senha, celular, foto, endereco } = req.body as AdotanteEntity;
-            const adotante = new AdotanteEntity(nome, senha, celular, foto, endereco);
-            await this.adotanteRepository.atualizaAdotante(Number(id), adotante);
-            return res.status(200).json({message: "Adotante atualizado com sucesso!"});
-        } catch (err) {
-            return res.status(404).json({message: "Não foi possível atualizar o adotante, tente novamente mais tarde!"});
-        }
+            const {success, message } = await this.adotanteRepository.atualizaAdotante(Number(id), req.body as AdotanteEntity);
+            if(!success) {
+                return res.status(404).json({error: message});
+            }
+            return res.sendStatus(204);
     }
 
-    async deletaAdotante(req: Request, res: Response): Promise<any> {
-        try {
+    async deletaAdotante(req: Request<TipoRequestParamsAdotante, {}, TipoRequestBodyAdotante>, res: Response<TipoResponseBodyAdotante>): Promise<any> {
             const { id } = req.params;
-            await this.adotanteRepository.deletaAdotante(Number(id));
-            return res.status(204).json({message: "Adotante deletado com sucesso!"});
-        } catch (err) {
-            res.status(404).json({message: "Não foi possível deletar o adotante, tente novamente mais tarde!"});
-        }
+            const {success, message } =  await this.adotanteRepository.deletaAdotante(Number(id));
+            if(!success) {
+                return res.status(404).json({error: message});
+            }
+            return res.status(204);
     }
 
-    async atualizaEnderecoAdotante(req: Request, res: Response): Promise<any> {
+    async atualizaEnderecoAdotante(req: Request<TipoRequestParamsAdotante, {}, TipoRequestBodyAdotante>, res: Response<TipoResponseBodyAdotante>): Promise<any> {
         const { id } = req.params;
-        const { success, message } = await this.adotanteRepository.atualizaEnderecoAdotante(Number(id), req.body as EnderecoEntity);
+        const { success, message } = await this.adotanteRepository.atualizaEnderecoAdotante(Number(id), req.body.endereco as EnderecoEntity);
         if (!success) {
-            return res.status(404).json(message);
+            return res.status(404).json({error: message});
         }
-        return res.status(200).json(message);
+        return res.status(204);
     }
 }
