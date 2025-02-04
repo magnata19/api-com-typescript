@@ -14,13 +14,12 @@ export default class AdotanteController {
 
     async criarAdotante(req: Request<TipoRequestParamsAdotante, {}, TipoRequestBodyAdotante>, res: Response<TipoResponseBodyAdotante>): Promise<any>{
         try {
-
             const { nome, senha, celular, foto, endereco } = req.body as AdotanteEntity;
             const adotante = new AdotanteEntity(nome, senha, celular, foto, endereco);
             await this.adotanteRepository.criarAdotante(adotante);
             return res.status(201).json({data: {id: adotante.id, nome, celular}});
         } catch (err) {
-            return res.status(404).json();
+            return res.status(404).json({error: {message: "Erro ao criar um adotante."}});
         }
     }
 
@@ -47,7 +46,7 @@ export default class AdotanteController {
             if(!success) {
                 return res.status(404).json({error: message});
             }
-            return res.sendStatus(204);
+            return res.status(200).json({success: message});
     }
 
     async deletaAdotante(req: Request<TipoRequestParamsAdotante, {}, TipoRequestBodyAdotante>, res: Response<TipoResponseBodyAdotante>): Promise<any> {
@@ -65,6 +64,6 @@ export default class AdotanteController {
         if (!success) {
             return res.status(404).json({error: message});
         }
-        return res.status(204);
+        return res.status(200).json({success: message});
     }
 }
