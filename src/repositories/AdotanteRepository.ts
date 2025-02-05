@@ -46,7 +46,8 @@ export default class AdotanteRepository implements InterfaceAdotanteRepository {
     }
 
     async atualizaEnderecoAdotante(idAdotante: number, endereco: EnderecoEntity): Promise<{ success: boolean; message?: string }> {
-        const adotante = await this.adotanteRepository.findOne({where: { id: idAdotante }});
+        try {
+            const adotante = await this.adotanteRepository.findOne({where: { id: idAdotante }});
         if(!adotante) {
             return {success: false, message: "Erro ao atualizar endereço."};
         }
@@ -54,6 +55,9 @@ export default class AdotanteRepository implements InterfaceAdotanteRepository {
         adotante.endereco = novoEndereco;
         await this.adotanteRepository.save(adotante);
         return {success: true, message:"Endereço atualizado com sucesso!"};
+        } catch (err) {
+            return {success: false, message: `Erro ao tentar atualizar um endereço. ERRO - ${err}`}
+        }
     }
 
 }
