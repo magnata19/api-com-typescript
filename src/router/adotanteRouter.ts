@@ -13,7 +13,7 @@ const validateBodyAdotante: RequestHandler = (req, res, next) => middlewareValid
 const validateBodyEndereco: RequestHandler = (req, res, next) => middlewareValidationBodyEndereco(req, res, next);
 
 router.get("/", (req: Request, res: Response) => adotanteController.listaAdotantes(req, res));
-router.post("/", validateBodyAdotante, validateBodyEndereco,(req: Request, res:Response) => adotanteController.criarAdotante(req, res));
+router.post("/", validateBodyAdotante,(req: Request, res:Response) => adotanteController.criarAdotante(req, res));
 router.put("/:id", (req: Request, res: Response) => adotanteController.atualizaAdotante(req, res));
 router.delete("/:id", (req: Request, res: Response) => adotanteController.deletaAdotante(req, res));
 router.patch("/:id", validateBodyEndereco, (req: Request, res: Response) => adotanteController.atualizaEnderecoAdotante(req, res));

@@ -4,8 +4,10 @@ import { TipoRequestBodyAdotante } from "../../tipos/tiposAdotante";
 
 const esquemaBodyAdotante: yup.ObjectSchema<Omit<TipoRequestBodyAdotante, "endereco">> = yup.object({
     nome: yup.string().defined().required('Nome é um campo obrigatório.'),
-    senha: yup.string().defined().required('Senha é um campo obrigatório.').min(6, 'A senha deve conter no mínimo 6 caracteres.'),
-    celular: yup.string().defined().required('Celular é um campo obrigatório.'),
+    senha: yup.string().defined().required('Senha é um campo obrigatório.').min(6, 'A senha deve conter no mínimo 6 caracteres.')
+    .matches(/^(?=.*\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[^\w\d\s:])([^\s]){8,16}$/gm, "Senha inválida."),
+    celular: yup.string().defined().required('Celular é um campo obrigatório.').matches(
+        /^(\(?[0-9]{2}\)?)? ?([0-9]{4,5})-?([0-9]{4})$/gm, "Celular inválido"),
     foto: yup.string().optional()
 
 })
